@@ -239,11 +239,15 @@ def pre():
         age = int(request.form['age'])
         
         data = np.array([[preg, glucose, bp, st, insulin, bmi, dpf, age]])
+        
+        # Predict the class
         my_prediction = classifier.predict(data)
         
-        return render_template('diabetesresult.html', prediction=my_prediction)
-    
-
+        # Get the probability of having diabetes
+        probabilities = classifier.predict_proba(data)
+        diabetes_probability = probabilities[0][1] * 100  # Assuming class 1 is diabetes
+        
+        return render_template('diabetesresult.html', prediction=my_prediction, probability=diabetes_probability)
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.json
