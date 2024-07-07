@@ -34,20 +34,19 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            
         }
     
         #selectedSymptoms,
         #symptomList {
-            width: calc(50% - 15px); /* Adjust width as needed */
+            width: calc(50% - 15px);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             background-color: #c7c4c4;
-            max-height: 500px; /* Maximum height for scrollbar */
-            overflow-y: auto; /* Enable vertical scrollbar */
+            max-height: 500px;
+            overflow-y: auto;
         }
     
         .symptom-item {
@@ -58,8 +57,8 @@
             border-radius: 5px;
             display: inline-block;
             transition: background-color 0.3s;
-            justify-content:center;
-  align-items: center;
+            justify-content: center;
+            align-items: center;
         }
     
         .symptom-item:hover {
@@ -117,7 +116,7 @@
         .btn-info:hover {
             background-color: #011214;
         }
-         /* Styling for the beautiful link */
+    
         .back-link {
             display: inline-block;
             padding: 10px 20px;
@@ -134,34 +133,38 @@
         .back-link:hover {
             background-color: #004d40;
         }
+
+        #searchInput {
+            width: 40%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
     </style>
-    
 </head>
 <body>
     <a href="/" class="back-link">Back to Home</a>
     <div id="container">
-       
         <div id="symptomsContainer">
             <div id="selectedSymptoms">
-                    <button id="clearButton" class="btn btn-danger">Clear Selection</button>
-               
+                <button id="clearButton" class="btn btn-danger">Clear Selection</button>
                 <h3>Selected Symptoms</h3>
                 <!-- List of selected symptoms will be shown here -->
             </div>
             <div id="symptomList">
                 <h3>All Symptoms</h3>
-                <!-- List of all symptoms will be generated here -->
+                <input type="text" id="searchInput" placeholder="Search Symptoms">
+                <div id="symptomItems"></div>
             </div>
         </div>
-        
-        
         <button id="predictButton" class="btn btn-primary mt-3">Predict Disease</button>
         <div id="result"></div>
         <div id="description"></div>
         <button id="newPatientButton" class="btn btn-info mt-3" style="display: none;">New Patient</button>
     </div>
-    
-    
+
     <script>
         const symptoms = [
             'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills', 
@@ -192,67 +195,68 @@
             'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
         ];
 
-        const symptomList = document.getElementById('symptomList');
+        const symptomList = document.getElementById('symptomItems');
         const selectedSymptoms = document.getElementById('selectedSymptoms');
         const resultDiv = document.getElementById('result');
         const descriptionDiv = document.getElementById('description');
         const predictButton = document.getElementById('predictButton');
         const clearButton = document.getElementById('clearButton');
         const newPatientButton = document.getElementById('newPatientButton');
-        const userDetailsForm = document.getElementById('userDetailsForm');
-        const symptomsSection = document.getElementById('symptomsSection');
+        const searchInput = document.getElementById('searchInput');
 
-        symptoms.forEach(symptom => {
+        function createSymptomItem(symptom) {
             const symptomItem = document.createElement('div');
             symptomItem.className = 'symptom-item';
             symptomItem.innerText = symptom;
             symptomItem.onclick = () => addSymptom(symptom);
-            symptomList.appendChild(symptomItem);
-        });
+            return symptomItem;
+        }
+
+        function updateSymptomList(filteredSymptoms) {
+            symptomList.innerHTML = '';
+            filteredSymptoms.forEach(symptom => {
+                symptomList.appendChild(createSymptomItem(symptom));
+            });
+        }
 
         function addSymptom(symptom) {
             const existingSymptom = Array.from(selectedSymptoms.children).find(child => child.innerText === symptom);
             if (!existingSymptom) {
-                const symptomItem = document.createElement('div');
-                symptomItem.className = 'symptom-item';
-                symptomItem.innerText = symptom;
+                const symptomItem = createSymptomItem(symptom);
                 symptomItem.onclick = () => removeSymptom(symptomItem);
                 selectedSymptoms.appendChild(symptomItem);
-                symptomsSection.style.display = 'block'; // Show symptoms section
             }
         }
 
         function removeSymptom(symptomItem) {
             selectedSymptoms.removeChild(symptomItem);
-            if (selectedSymptoms.children.length === 0) {
-                symptomsSection.style.display = 'none'; // Hide symptoms section
-                resultDiv.innerHTML = ''; // Clear result
-                descriptionDiv.innerHTML = ''; // Clear description
-            }
         }
 
-       predictButton.onclick = async () => {
-    const selected = Array.from(selectedSymptoms.children).map(child => child.innerText);
-    console.log('Selected Symptoms:', selected); // Debugging statement
-    if (selected.length === 0) {
-        alert('Please select at least one symptom.');
-        console.log('No symptoms selected.'); // Debugging statement
-        return;
-    }
-    const response = await fetch('/predict', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(selected)
-    });
-    const result = await response.json();
-    resultDiv.innerHTML = `<strong>Predicted Disease:</strong> ${result.predicted_disease}`;
-    descriptionDiv.innerHTML = `<strong>Description:</strong> ${result.description}`;
-};
+        searchInput.oninput = () => {
+            const query = searchInput.value.toLowerCase();
+            const filteredSymptoms = symptoms.filter(symptom => symptom.toLowerCase().includes(query));
+            updateSymptomList(filteredSymptoms);
+        };
 
+        predictButton.onclick = async () => {
+            const selected = Array.from(selectedSymptoms.children).map(child => child.innerText);
+            if (selected.length === 0) {
+                alert('Please select at least one symptom.');
+                return;
+            }
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(selected)
+            });
+            const result = await response.json();
+            resultDiv.innerHTML = `<strong>Predicted Disease:</strong> ${result.predicted_disease}`;
+            descriptionDiv.innerHTML = `<strong>Description:</strong> ${result.description}`;
+        };
 
-clearButton.onclick = () => {
+        clearButton.onclick = () => {
             Array.from(selectedSymptoms.children)
                 .filter(child => child.tagName === 'DIV')
                 .forEach(child => selectedSymptoms.removeChild(child));
@@ -261,9 +265,13 @@ clearButton.onclick = () => {
         };
 
         newPatientButton.onclick = () => {
-            symptomsSection.style.display = 'none'; // Hide symptoms section
-            userDetailsForm.reset(); // Reset form fields
+            selectedSymptoms.innerHTML = '';
+            resultDiv.innerHTML = '';
+            descriptionDiv.innerHTML = '';
         };
+
+        // Initial rendering of symptom list
+        updateSymptomList(symptoms);
     </script>
 </body>
 </html>

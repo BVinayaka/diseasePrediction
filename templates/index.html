@@ -186,13 +186,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
                     </li>
-                    {% if session['email'] %}
+                    {% if 'user' in session %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="confirmLogout()">Logout</a>
+                      <a class="nav-link" onclick="confirmLogout()">LOGOUT</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                      <a class="nav-link" href="/login">LOGIN</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -240,12 +240,12 @@
         </div>
         <div class="col-md-4">
             <div class="card">
-                <a href="/hospital" class="link">
+                <a href="/dia" class="link">
                     <img src="./static/disease.avif" class="card-img-top" alt="Nearby Hospital Image" style="width: 100%; height: auto;">
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title text-uppercase fw-semibold text-info">Nearby Hospital</h5>
-                    <p class="card-text text-capitalize fw-medium">Find nearby hospitals and healthcare facilities for immediate assistance.</p>
+                    <h5 class="card-title text-uppercase fw-semibold text-info">Diabetes Predictor</h5>
+                    <p class="card-text text-capitalize fw-medium">Predict your likelihood of diabetes based on symptoms and risk factors.</p>
                 </div>
             </div>
         </div>
@@ -357,6 +357,11 @@
                 selectedSymptoms.removeChild(selectedSymptoms.firstChild);
             }
         };
+        function confirmLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+            window.location.href = "/logout";
+        }
+    }
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>

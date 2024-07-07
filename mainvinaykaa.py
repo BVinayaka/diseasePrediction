@@ -1,14 +1,26 @@
-from flask import Flask, request, jsonify, render_template
+import string
+import bcrypt
+from flask import Flask, redirect, render_template, jsonify, request, session
+import joblib
 import pandas as pd
 import numpy as np
 from joblib import load
+from pymongo import MongoClient
 import requests
 
 app = Flask(__name__)
 headers = {
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTkzN2YwYjgtZDQ2MS00OGJkLTg0NDItYTM5M2NhNWU0NTg0IiwidHlwZSI6ImFwaV90b2tlbiJ9.K1s4lp6Nl-7Bd4UFEfKDN_GQl-CIISWcJZxKLEMU9xc"
 }
+app.secret_key = 'b\xb8\xc18\x8f/\xd8\x97\xc0c[\xb5zd\xe8\x1f\xa4\xbc\xa5\x1c\xec\x86\xa5?\xb1'
+client = MongoClient('mongodb://localhost:27017/')
+db = client['DiseasePrediction']
+users_collection = db['users']   # Collection for session management
 
+
+
+filename = 'diabetes-prediction-rfc-model.pkl'
+classifier = joblib.load(filename)
 
 
 # Load pre-trained model
@@ -86,7 +98,78 @@ def get_nearby_hospitals(lat, lon):
 @app.route('/')
 def home():
     return render_template('index.html')
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        name = request.form['username']
+        email = request.form['email']
+        mobile = request.form['mobile']
+        password1 = request.form['password']
+        password2 = request.form['confirm_password']
 
+        # Check if passwords match
+        if password1 != password2:
+            return render_template('signup.html', message='Passwords do not match')
+
+        # Check if password meets criteria
+        if not (len(password1) >= 8 and any(c.isupper() for c in password1)
+                and any(c.islower() for c in password1) and any(c.isdigit() for c in password1)
+                and any(c in string.punctuation for c in password1)):
+            return render_template('signup.html', message='Password criteria not met')
+
+        hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
+
+        # Check if email already exists
+        existing_user = users_collection.find_one({'email': email})
+        if existing_user:
+            return render_template('signup.html', message='Email already exists. If you already have an account, please log in.')
+
+        # Insert new user into users_collection
+        user_data = {
+            'name': name,
+            'email': email,
+            'mobile': mobile,
+            'password': hashed_password
+        }
+        users_collection.insert_one(user_data)
+
+        return redirect('/')
+
+    return render_template('signup.html')
+
+
+@app.route('/logout')
+def logout():
+    # Remove user from session
+    session.pop('user', None)
+    
+    return redirect('/')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        # Find user by email
+        user = users_collection.find_one({'email': email})
+
+        if user:
+            # Convert ObjectId to string
+            user['_id'] = str(user['_id'])
+
+            # Check if password matches
+            if bcrypt.checkpw(password.encode('utf-8'), user['password']):
+                # Store user data in session
+                session['user'] = user
+                return redirect('/')
+            else:
+                return render_template('login.html', message='Incorrect password')
+        else:
+            return render_template('login.html', message='User not found')
+
+    return render_template('login.html')
 @app.route('/hospital', methods=['GET', 'POST'])
 def hospital():
     hospitals = []
@@ -128,5 +211,26 @@ def predict():
         'description': description
     })
 
+
+@app.route('/dia')
+def dia():
+    return render_template('diabetes.html')
+
+@app.route('/pre', methods=['POST'])
+def pre():
+    if request.method == 'POST':
+        preg = int(request.form['pregnancies'])
+        glucose = int(request.form['glucose'])
+        bp = int(request.form['bloodpressure'])
+        st = int(request.form['skinthickness'])
+        insulin = int(request.form['insulin'])
+        bmi = float(request.form['bmi'])
+        dpf = float(request.form['dpf'])
+        age = int(request.form['age'])
+        
+        data = np.array([[preg, glucose, bp, st, insulin, bmi, dpf, age]])
+        my_prediction = classifier.predict(data)
+        
+        return render_template('diabetesresult.html', prediction=my_prediction)
 if __name__ == '__main__':
     app.run(debug=True)
