@@ -50,11 +50,11 @@ body {
 		<div class="results">
 			{% if prediction==1 %}
 				<h1>Prediction: <span class='danger'>Opps! You have DIABETES.</span></h1>
-				<img class="gif" src="{{ url_for('static', filename='diabetes.webp') }}" alt="Diabetes Image">
+				<p>Probability of having diabetes: {{ probability }}%</p>
 			{% elif prediction==0 %}
 				<h1>Prediction: <span class='safe'>Wow ! You DON'T have diabetes.</span></h1>
-				<img class="gif1" src="{{ url_for('static', filename='no-diabetes.webp') }}" alt="Not Diabetes Image">
-			{% endif %}
+				<p>Probability of having diabetes: {{ probability }}%</p>
+				{% endif %}
 		</div>
         <a href="/hospital" class="back-link">Near BY Hospital</a>
 		
