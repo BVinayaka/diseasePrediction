@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disease Prediction</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Optional custom styles */
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +17,7 @@
             padding: 0;
             background-color: #ffffff;
         }
-       
+
         h1,
         h3 {
             text-align: center;
@@ -41,36 +45,50 @@
           width: 100%;
           height: 100vh;
           overflow: hidden;
-      }
-      #backgroundImg {
+        }
+      
+        #backgroundImg {
           width: 100%;
           height: 100%;
           object-fit: cover;
-      }
-      #overlayText {
           position: absolute;
-          top: 50%;
+          top: 0;
           left: 0;
-          transform: translateY(-50%);
+          z-index: 1;
+        }
+      
+        #overlayText {
+          position: relative;
+          z-index: 2;
           color: white;
           padding: 20px;
-          width: 80%; /* Adjust width as needed */
-          max-width: 800px; /* Maximum width for larger screens */
           text-align: left;
-      }
-      @media (max-width: 991.98px) {
-          #overlayText {
-              position: relative;
-              top: auto;
-              left: auto;
-              transform: none;
-              width: 100%; /* Full width on smaller screens */
-              max-width: none; /* No maximum width on smaller screens */
-              padding: 10px;
-              text-align: center;
-          }
-      }
+          margin-top: 150px; 
+        }
       
+        .glassmorphism {
+          background: rgba(255, 255, 255, 0.2); 
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+        }
+      
+        @media (max-width: 768px) {
+          #overlayText {
+            padding: 10px;
+            text-align: center;
+          }
+      
+          .navbar-nav {
+            flex-direction: column;
+          }
+      
+          .nav-item {
+            margin-bottom: 10px;
+          }
+        }
+
 
         #selectedSymptoms,
         #symptomList {
@@ -124,11 +142,11 @@
         }
 
         #navbarNav {
-          text-align: center; /* Center align the nav items */
+          text-align: left;
       }
       #navbarNav .nav-item {
-          display: inline-block; /* Display nav items inline */
-          margin: 0 10px; /* Adjust margin between nav items */
+          display: inline-block;
+          margin: 0 10px;
       }
 
         footer {
@@ -207,7 +225,7 @@
 #chatbotMessages {
   display: flex;
   flex-direction: column; /* Stack messages vertically */
-  align-items: flex-start; 
+  align-items: flex-start;
   max-height: 400px; /* Set a max height to enable scrolling */
   overflow-y: auto;/* Align messages to the start (left) */
   gap: 10px; /* Spacing between messages */
@@ -322,9 +340,7 @@
   background-color: #1d6fa5;
 }
 
-.navbar {
-  background-image: linear-gradient(to right, #4a90e2, #1854a3);
-}
+
 #welcomeContainer {
   border: 1px solid #ccc;
   padding: 20px;
@@ -541,12 +557,12 @@ tr:nth-child(even) {
   color: #3e1cae;
   margin-right: 10px;
   background-color: white;
-  
+
 }
 #userInputContainer{
   position: absolute;
     bottom: 0;
-    width: 100%; 
+    width: 100%;
     color: red;
 }
 #closeChatbot {
@@ -645,58 +661,112 @@ tr:nth-child(even) {
   color: #999; /* Change the color of the placeholder text */
 }
 
-/* Style for the input field on focus */
+
 #searchInput:focus {
-  outline: none; /* Remove default focus outline */
-  border-color: #66afe9; /* Change border color on focus */
-  box-shadow: 0 0 5px #66afe9; /* Add a box shadow on focus */
+  outline: none;
+  border-color: #66afe9;
+  box-shadow: 0 0 5px #66afe9;
 }
+
+.social-icons {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: left;
+}
+.social-icons li {
+  margin: 0 10px;
+}
+.social-icons li a {
+  font-size: 2rem;
+}
+
+.service-card {
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  border: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.service-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.card-body {
+  text-align: center;
+}
+
+.rounded-tl-br {
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+
+
+
+
 
     </style>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" id="nav">
-    <div class="container-fluid">
+
+  <!--Hero Section-->
+  <div id="backgroundContainer">
+   
+    <nav class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top glassmorphism">
+      <div class="container-fluid">
+       
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+          <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto"> <!-- mx-auto for horizontal centering -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#about">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#services">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact</a>
-                </li>
-                {% if 'user' in session %}
-                <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="confirmLogout()">LOGOUT</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">LOGIN</a>
-                </li>
-                {% endif %}
-            </ul>
+  
+      
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="#services">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="#contact">Contact</a>
+            </li>
+            {% if 'user' in session %}
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="#" onclick="confirmLogout()">LOGOUT</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link text-white fw-bold" href="/login">LOGIN</a>
+            </li>
+            {% endif %}
+          </ul>
         </div>
-    </div>
-</nav>
-    <!-- Background Image with Overlay Text -->
-    <div id="backgroundContainer">
-      <img id="backgroundImg" src="./static/doctor-examines.jpg" alt="Background Image">
-      <div id="overlayText" class="col-md-6 offset-md-0">
-          <p class="fw-bolder fs-1">Find The Good Life<br>With <span class="text-success">Good Health</span></p>
-          <p class="text-dark fw-bold">Empower your health with our advanced disease prediction tool. Utilizing cutting-edge machine learning algorithms, our platform analyzes your symptoms to provide accurate and timely predictions, helping you take proactive steps towards better health. Trust in technology to guide your wellness journey.</p>
-          <a href="#services" class="btn btn-primary">Get Started <i class="bi bi-chevron-down"></i></a>
       </div>
+    </nav>
+  
+    
+    <img id="backgroundImg" src="./static/doctor-examines.jpg" alt="Background Image">
+    <div id="overlayText" class="col-md-6 offset-md-0">
+      <p class="fw-bolder fs-1">Find The Good Life<br>With <span class="text-info">Good Health</span></p>
+      <p class="text-white fw-bold">Empower your health with our advanced disease prediction tool. Utilizing cutting-edge machine learning algorithms, our platform analyzes your symptoms to provide accurate and timely predictions, helping you take proactive steps towards better health. Trust in technology to guide your wellness journey.</p>
+      <a href="#services" class="btn btn-outline-light w-50">Get Started <i class="bi bi-chevron-down"></i></a>
+    </div>
   </div>
+
+
+<!--Chatbot-->
+
+
 
 
     <div id="chatbotContainer">
@@ -719,46 +789,71 @@ tr:nth-child(even) {
         <img src="./static/download.png" alt="Chatbot Icon" />
     </button>
 
-    <hr><hr>
-    <div class="text-center" id="services">
-        <h2 class="text-capitalize text-info fs-1 fw-bold mb-4">Our Services</h2>
-    </div>
-    <div class="row row-cols-1 row-cols-md-3 g-4 m-3">
-        <div class="col-md-4">
-            <div class="card">
-                <a href="/disease" class="link">
-                    <img src="./static/disease.avif" class="card-img-top" alt="Disease Prediction Image" style="width: 100%; height: auto;">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title text-uppercase fw-semibold text-info">Disease Prediction</h5>
-                    <p class="card-text text-capitalize fw-medium">Predict diseases based on your symptoms and receive recommended treatments.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <a href="/hospital" class="link">
-                    <img src="./static/disease.avif" class="card-img-top" alt="Nearby Hospital Image" style="width: 100%; height: auto;">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title text-uppercase fw-semibold text-info">Nearby Hospital</h5>
-                    <p class="card-text text-capitalize fw-medium">Find nearby hospitals and healthcare facilities for immediate assistance.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <a href="/dia" class="link">
-                    <img src="./static/disease.avif" class="card-img-top" alt="Nearby Hospital Image" style="width: 100%; height: auto;">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title text-uppercase fw-semibold text-info">Diabetes Predictor</h5>
-                    <p class="card-text text-capitalize fw-medium">Predict your likelihood of diabetes based on symptoms and risk factors.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+
+
+    <!--Service Section-->
+    <div class="container mt-5">
+      <div class="row">
+
+          <div class="col-md-4 mt-5">
+              <div class="text-left">
+                  <h2 class="text-capitalize text-dark fs-1 fw-bold mb-4">We take care<br> of your<br><span class="text-info" >Good health</span></h2>
+                  <p class="fw-medium mb-4">Empower your health with our advanced disease prediction tool. Utilizing cutting-edge machine learning algorithms, our platform analyzes your symptoms to provide accurate and timely predictions.</p>
+
+                  <ul class="social-icons">
+                      <li><a href="#"><i class="fab fa-facebook text-info"></i></a></li>
+                      <li><a href="#"><i class="fab fa-twitter text-info"></i></a></li>
+                      <li><a href="#"><i class="fab fa-instagram text-info"></i></a></li>
+                  </ul>
+              </div>
+          </div>
+
+
+          <div class="col-md-8">
+              <div class="row row-cols-1 row-cols-md-3 g-4">
+                  <div class="col">
+                      <div class="card service-card rounded-tl-br bg-info">
+                          <div class="service-icon">
+                              <i class="fa-solid fa-mask-face"></i>
+                          </div>
+                          <div class="card-body">
+                              <h5 class="card-title text-uppercase fw-semibold">Disease Prediction</h5>
+                              <p class="card-text text-capitalize fw-medium">Predict diseases based on your symptoms and receive recommended treatments.</p>
+                              <a href="/disease" class="btn btn-outline-light">Predict</a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="card service-card rounded-tl-br bg-info">
+                          <div class="service-icon">
+                              <i class="fas fa-hospital"></i>
+                          </div>
+                          <div class="card-body">
+                              <h5 class="card-title text-uppercase fw-semibold">Nearby Hospital</h5><br>
+                              <p class="card-text text-capitalize fw-medium">Find nearby hospitals and healthcare facilities for immediate assistance.</p>
+                              <a href="/hospital" class="btn btn-outline-light">Near By</a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col">
+                      <div class="card service-card rounded-tl-br bg-info">
+                          <div class="service-icon">
+                              <i class="fas fa-stethoscope"></i>
+                          </div>
+                          <div class="card-body">
+                              <h5 class="card-title text-uppercase fw-semibold">Diabetes Predictor</h5>
+                              <p class="card-text text-capitalize fw-medium">Predict your likelihood of diabetes based on symptoms and risk factors.</p>
+                              <a href="/dia" class="btn btn-outline-light">Test</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+    <!--About Us-->
     <section class="container-fluid py-5 about" id="about">
         <div class="container" id="container">
             <div class="text-center">
@@ -779,31 +874,31 @@ tr:nth-child(even) {
 
     <script>
         const symptoms = [
-            'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills', 
-            'joint_pain', 'stomach_pain', 'acidity', 'ulcers_on_tongue', 'muscle_wasting', 'vomiting', 
-            'burning_micturition', 'spotting_urination', 'fatigue', 'weight_gain', 'anxiety', 
-            'cold_hands_and_feets', 'mood_swings', 'weight_loss', 'restlessness', 'lethargy', 
-            'patches_in_throat', 'irregular_sugar_level', 'cough', 'high_fever', 'sunken_eyes', 
-            'breathlessness', 'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish_skin', 
-            'dark_urine', 'nausea', 'loss_of_appetite', 'pain_behind_the_eyes', 'back_pain', 
-            'constipation', 'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellow_urine', 'yellowing_of_eyes', 
-            'acute_liver_failure', 'fluid_overload', 'swelling_of_stomach', 'swelled_lymph_nodes', 'malaise', 
-            'blurred_and_distorted_vision', 'phlegm', 'throat_irritation', 'redness_of_eyes', 'sinus_pressure', 
-            'runny_nose', 'congestion', 'chest_pain', 'weakness_in_limbs', 'fast_heart_rate', 
-            'pain_during_bowel_movements', 'pain_in_anal_region', 'bloody_stool', 'irritation_in_anus', 
-            'neck_pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs', 'swollen_blood_vessels', 
-            'puffy_face_and_eyes', 'enlarged_thyroid', 'brittle_nails', 'swollen_extremeties', 'excessive_hunger', 
-            'extra_marital_contacts', 'drying_and_tingling_lips', 'slurred_speech', 'knee_pain', 'hip_joint_pain', 
-            'muscle_weakness', 'stiff_neck', 'swelling_joints', 'movement_stiffness', 'spinning_movements', 
-            'loss_of_balance', 'unsteadiness', 'weakness_of_one_body_side', 'loss_of_smell', 'bladder_discomfort', 
-            'foul_smell_of_urine', 'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching', 
-            'toxic_look_(typhos)', 'depression', 'irritability', 'muscle_pain', 'altered_sensorium', 
-            'red_spots_over_body', 'belly_pain', 'abnormal_menstruation', 'dischromic_patches', 'watering_from_eyes', 
-            'increased_appetite', 'polyuria', 'family_history', 'mucoid_sputum', 'rusty_sputum', 'lack_of_concentration', 
-            'visual_disturbances', 'receiving_blood_transfusion', 'receiving_unsterile_injections', 'coma', 
-            'stomach_bleeding', 'distention_of_abdomen', 'history_of_alcohol_consumption', 'fluid_overload.1', 
-            'blood_in_sputum', 'prominent_veins_on_calf', 'palpitations', 'painful_walking', 'pus_filled_pimples', 
-            'blackheads', 'scurring', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 
+            'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills',
+            'joint_pain', 'stomach_pain', 'acidity', 'ulcers_on_tongue', 'muscle_wasting', 'vomiting',
+            'burning_micturition', 'spotting_urination', 'fatigue', 'weight_gain', 'anxiety',
+            'cold_hands_and_feets', 'mood_swings', 'weight_loss', 'restlessness', 'lethargy',
+            'patches_in_throat', 'irregular_sugar_level', 'cough', 'high_fever', 'sunken_eyes',
+            'breathlessness', 'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish_skin',
+            'dark_urine', 'nausea', 'loss_of_appetite', 'pain_behind_the_eyes', 'back_pain',
+            'constipation', 'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellow_urine', 'yellowing_of_eyes',
+            'acute_liver_failure', 'fluid_overload', 'swelling_of_stomach', 'swelled_lymph_nodes', 'malaise',
+            'blurred_and_distorted_vision', 'phlegm', 'throat_irritation', 'redness_of_eyes', 'sinus_pressure',
+            'runny_nose', 'congestion', 'chest_pain', 'weakness_in_limbs', 'fast_heart_rate',
+            'pain_during_bowel_movements', 'pain_in_anal_region', 'bloody_stool', 'irritation_in_anus',
+            'neck_pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs', 'swollen_blood_vessels',
+            'puffy_face_and_eyes', 'enlarged_thyroid', 'brittle_nails', 'swollen_extremeties', 'excessive_hunger',
+            'extra_marital_contacts', 'drying_and_tingling_lips', 'slurred_speech', 'knee_pain', 'hip_joint_pain',
+            'muscle_weakness', 'stiff_neck', 'swelling_joints', 'movement_stiffness', 'spinning_movements',
+            'loss_of_balance', 'unsteadiness', 'weakness_of_one_body_side', 'loss_of_smell', 'bladder_discomfort',
+            'foul_smell_of_urine', 'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching',
+            'toxic_look_(typhos)', 'depression', 'irritability', 'muscle_pain', 'altered_sensorium',
+            'red_spots_over_body', 'belly_pain', 'abnormal_menstruation', 'dischromic_patches', 'watering_from_eyes',
+            'increased_appetite', 'polyuria', 'family_history', 'mucoid_sputum', 'rusty_sputum', 'lack_of_concentration',
+            'visual_disturbances', 'receiving_blood_transfusion', 'receiving_unsterile_injections', 'coma',
+            'stomach_bleeding', 'distention_of_abdomen', 'history_of_alcohol_consumption', 'fluid_overload.1',
+            'blood_in_sputum', 'prominent_veins_on_calf', 'palpitations', 'painful_walking', 'pus_filled_pimples',
+            'blackheads', 'scurring', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails',
             'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
         ];
 
