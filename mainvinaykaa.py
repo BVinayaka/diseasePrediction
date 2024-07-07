@@ -78,7 +78,16 @@ def get_disease_description(disease):
         return "Sorry, something went wrong."
 
 
-def get_nearby_hospitals(lat, lon):
+@app.route('/hospital', methods=['POST'])
+def get_nearby_hospitals():
+    data = request.get_json()
+    lat = data['latitude']
+    lon = data['longitude']
+    
+    # Log received coordinates for debugging
+    app.logger.info(f"Received Latitude: {lat}")
+    app.logger.info(f"Received Longitude: {lon}")
+    
     overpass_url = "http://overpass-api.de/api/interpreter"
     overpass_query = f"""
     [out:json];
@@ -93,7 +102,8 @@ def get_nearby_hospitals(lat, lon):
         lat = element['lat']
         lon = element['lon']
         hospitals.append({'name': name, 'lat': lat, 'lon': lon})
-    return hospitals
+    return jsonify({'hospitals': hospitals})
+
 
 @app.route('/')
 def home():
@@ -232,5 +242,34 @@ def pre():
         my_prediction = classifier.predict(data)
         
         return render_template('diabetesresult.html', prediction=my_prediction)
+    
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.json
+    question = data.get('question')
+
+    text1 = "i need information related to disease"
+    text2 = "please give me related to disease only"
+
+    payload = {
+        "providers": "openai",
+        "texts": [text1, text2],
+        "question": question,
+        "examples_context": "In 2017, U.S. life expectancy was 78.6 years.",
+        "examples": [["What is human life expectancy in the United States?", "78 years."]],
+        "fallback_providers": ""
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        result = response.json()
+        answer = result['openai']['answers'][0]
+    else:
+        answer = "Sorry, something went wrong."
+
+    return jsonify({'answer': answer})
+
 if __name__ == '__main__':
     app.run(debug=True)

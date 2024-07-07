@@ -13,7 +13,7 @@
             padding: 0;
             background-color: #ffffff;
         }
-
+       
         h1,
         h3 {
             text-align: center;
@@ -162,6 +162,125 @@
         .card-body {
             text-align: center;
         }
+        #chatbotContainer {
+  position: fixed;
+  bottom: 30px;
+  right: 7%;
+  width: 520px;
+  max-width: 92%;
+  height: 420px;
+  background-color: #f9f9f9;
+  border: 2px solid #4a90e2;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  display: none;
+  scroll-behavior: auto;
+  z-index: 10;
+}
+
+@media (max-width: 992px) {
+  #chatbotContainer {
+    right: 10%;
+    width: 85%;
+  }
+
+  .strategy-box {
+    flex: 1 1 47%;
+  }
+}
+
+@media (max-width: 768px) {
+  #chatbotContainer {
+    right: 5%;
+    width: 92%;
+  }
+
+  .strategy-box {
+    flex: 1 1 100%;
+  }
+}
+
+#chatbotHeader {
+  background-color: #4a90e2;
+  color: #fff;
+  padding: 18px;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+#chatbotMessages {
+  display: flex;
+  flex-direction: column; /* Stack messages vertically */
+  align-items: flex-start; 
+  max-height: 400px; /* Set a max height to enable scrolling */
+  overflow-y: auto;/* Align messages to the start (left) */
+  gap: 10px; /* Spacing between messages */
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.chat-bubble {
+  display: inline-block;
+  max-width: 85%;
+  padding: 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.receiver {
+  background-color: #e1f5fe;
+  text-align: left;
+}
+.message {
+  width: fit-content; /* Adjust width based on content */
+  margin-bottom: 10px; /* Spacing between messages */
+  padding: 8px 12px; /* Padding inside each message */
+}
+.sender {
+  background-color: #fce4ec;
+  text-align: right;
+  color: #d81b60;
+}
+
+.chat-bubble p {
+  display: inline-block;
+  padding: 12px;
+  border-radius: 20px;
+  margin: 6px 14px;
+  max-width: 75%;
+  color: #555;
+  font-size: 1.4em;
+}
+
+#openChatbot {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #4a90e2;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 9999;
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+#openChatbot img {
+  width: 36px;
+  height: auto;
+  border-radius: 50%;
+}
+
+#openChatbot:hover {
+  transform: scale(1.05);
+}
+
     </style>
 </head>
 
@@ -209,8 +328,26 @@
             <a href="#services" class="btn btn-primary">Get Started <i class="bi bi-chevron-down"></i></a>
         </div>
     </div>
+    <div id="chatbotContainer">
+        <div id="chatbotHeader">
+            Chatbot
+            <button id="closeChatbot" onclick="closeChatbot()">×</button>
+        </div>
+        <div id="chatbotMessages">
+            <!-- Messages will be displayed here -->
+        </div>
+        <!-- User input field and send button -->
+        <div id="userInputContainer">
+            <input type="text" id="userInput" placeholder="Type your message..." onkeydown="if(event.keyCode===13) sendMessage()">
+            <button id="sendMessage" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
-    
+    <!-- Chatbot Icon Button -->
+    <button id="openChatbot" onclick="toggleChatbot()">
+        <img src="./static/download.png" alt="Chatbot Icon" />
+    </button>
+
     <hr><hr>
     <div class="text-center" id="services">
         <h2 class="text-capitalize text-info fs-1 fw-bold mb-4">Our Services</h2>
@@ -362,6 +499,78 @@
             window.location.href = "/logout";
         }
     }
+
+    function sendMessage() {
+        const userInput = document.getElementById("userInput").value;
+
+        if (userInput.trim() !== "") {
+          displayMessage("user", userInput);
+
+          // Prepare payload
+          const payload = {
+            text1: "stocks",
+            text2: "stocks",
+            question: userInput,
+          };
+
+          // Send POST request to the server
+          fetch("/chat", {
+            // Assuming your Python server is listening on '/chat'
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const answer = data.answer; // Assuming the response JSON has an 'answer' field
+              displayMessage("bot", answer);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              displayMessage("bot", "Sorry, something went wrong.");
+            });
+
+          // Clear the user input
+          document.getElementById("userInput").value = "";
+        }
+      }
+      function displayMessage(sender, message) {
+        const messageContainer = document.getElementById("chatbotMessages");
+
+        const messageElement = document.createElement("div");
+        messageElement.innerText = message;
+        messageElement.classList.add("message", sender);
+
+        if (sender === "user") {
+          messageElement.style.textAlign = "right"; // Align bot messages to the right
+          messageElement.style.backgroundColor = "#e6e6e6"; // Light blue background for bot messages
+          messageElement.style.borderRadius = "5px"; // Rounded corners
+          messageElement.style.marginLeft = "auto"; // Push bot messages to the right
+          messageElement.style.maxWidth = "70%"; // Limit width for bot messages
+          messageElement.style.textAlign = "left";
+        } else {
+          messageElement.style.textAlign = "left"; // Align user messages to the left
+          messageElement.style.backgroundColor = "#f0f0f0"; // Light gray background for user messages
+          messageElement.style.borderRadius = "5px"; // Rounded corners
+          messageElement.style.marginRight = "auto"; // Push user messages to the left
+          messageElement.style.maxWidth = "70%";
+          messageElement.style.textAlign = "left"; // Limit width for user messages
+        }
+
+        messageContainer.appendChild(messageElement);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
+      function closeChatbot() {
+        const chatbotContainer = document.getElementById("chatbotContainer");
+        chatbotContainer.style.display = "none"; // Hide the chatbot container
+      }
+
+    function toggleChatbot() {
+    const chatbotContainer = document.getElementById("chatbotContainer");
+    chatbotContainer.style.display = chatbotContainer.style.display === "none" ? "block" : "none";
+}
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>

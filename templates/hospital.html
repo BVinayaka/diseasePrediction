@@ -6,53 +6,97 @@
     <title>Nearby Hospitals</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-            // Disable further attempts to get location
-            window.getLocation = function() {};
-        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            const userLatitude = position.coords.latitude;
+                            const userLongitude = position.coords.longitude;
 
-        function showPosition(position) {
-            document.getElementById("latitude").value = position.coords.latitude;
-            document.getElementById("longitude").value = position.coords.longitude;
-            document.getElementById("locationForm").submit();
-        }
+                            console.log('User Latitude:', userLatitude);
+                            console.log('User Longitude:', userLongitude);
 
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurredaaa.");
-                    break;
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${userLatitude}&lon=${userLongitude}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const userLocation = data.display_name;
+                                    console.log('User Location:', userLocation);
+
+                                    fetch('/hospital', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            latitude: userLatitude,
+                                            longitude: userLongitude
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Received hospital data:', data);
+                                        const hospitalList = document.getElementById('hospitalList');
+                                        hospitalList.innerHTML = '';
+                                        data.hospitals.forEach(hospital => {
+                                            const listItem = document.createElement('li');
+                                            listItem.innerHTML = `${hospital.name} (${hospital.lat}, ${hospital.lon}) 
+                                                <a href="https://www.google.com/maps/dir/?api=1&origin=${userLatitude},${userLongitude}&destination=${hospital.lat},${hospital.lon}" target="_blank">Get Directions</a>`;
+                                            hospitalList.appendChild(listItem);
+                                        });
+                                    })
+                                    .catch(error => console.error('Error fetching hospitals:', error));
+                                })
+                                .catch(error => console.error('Error fetching location details:', error));
+                        },
+                        error => {
+                            console.error('Error getting user location:', error);
+                            // Handle errors or fallback to another method
+                        }
+                    );
+                } else {
+                    console.error('Geolocation is not supported by this browser.');
+                    // Handle unsupported browsers or fallback to another method
+                }
             }
-        }
+
+            getLocation();
+        });
     </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            text-decoration: none;
+            color: blue;
+        }
+
+        h1 {
+            margin: 20px 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+    </style>
 </head>
-<body onload="getLocation()">
+<body>
     <a href="/" class="back-link">Back to Home</a>
     <h1>Find Nearby Hospitals</h1>
-    <form id="locationForm" method="POST" action="/hospital">
-        <input type="hidden" id="latitude" name="latitude" required>
-        <input type="hidden" id="longitude" name="longitude" required>
-        <button type="submit">Search</button>
-    </form>
     <h2>Results:</h2>
-    <ul>
-        {% for hospital in hospitals %}
-            <li>{{ hospital.name }} ({{ hospital.lat }}, {{ hospital.lon }})</li>
-        {% endfor %}
-    </ul>
+    <ul id="hospitalList"></ul>
 </body>
 </html>
