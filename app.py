@@ -24,7 +24,7 @@ classifier = joblib.load(filename)
 
 
 # Load pre-trained model
-clf = load("C:/Users/vinay/Documents/Disease-Prediction-from-Symptoms-master/saved_model/decision_tree.joblib")
+clf = load("F:/diseasePrediction/saved_model/decision_tree.joblib")
 
 # Define symptoms
 symptoms = {'itching': 0, 'skin_rash': 0, 'nodal_skin_eruptions': 0, 'continuous_sneezing': 0,
