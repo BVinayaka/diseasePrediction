@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+    
+        h1,
+        h3 {
+            text-align: center;
+        }
+    
+        #container {
+            width: 90%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            text-indent: 30px;
+            line-height: 1.6;
+            font-size: large;
+        }
+    
+        #symptomsContainer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            
+        }
+    
+        #selectedSymptoms,
+        #symptomList {
+            width: calc(50% - 15px); /* Adjust width as needed */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            background-color: #c7c4c4;
+            max-height: 500px; /* Maximum height for scrollbar */
+            overflow-y: auto; /* Enable vertical scrollbar */
+        }
+    
+        .symptom-item {
+            cursor: pointer;
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s;
+            justify-content:center;
+  align-items: center;
+        }
+    
+        .symptom-item:hover {
+            background-color: #a93333;
+        }
+    
+        #selectedSymptoms .symptom-item {
+            background-color: #b2ebf2;
+            border-color: #9d2727;
+        }
+    
+        #predictButton {
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+    
+        #predictButton:hover {
+            background-color: #004d40;
+        }
+    
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00796b;
+        }
+    
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    
+        .btn-info {
+            background-color: #17a2b8;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        .btn-info:hover {
+            background-color: #011214;
+        }
+         /* Styling for the beautiful link */
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #00796b;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 1em;
+            margin-left: 20px;
+        }
+
+        .back-link:hover {
+            background-color: #004d40;
+        }
+    </style>
+    
+</head>
+<body>
+    <a href="/" class="back-link">Back to Home</a>
+    <div id="container">
+       
+        <div id="symptomsContainer">
+            <div id="selectedSymptoms">
+                    <button id="clearButton" class="btn btn-danger">Clear Selection</button>
+               
+                <h3>Selected Symptoms</h3>
+                <!-- List of selected symptoms will be shown here -->
+            </div>
+            <div id="symptomList">
+                <h3>All Symptoms</h3>
+                <!-- List of all symptoms will be generated here -->
+            </div>
+        </div>
+        
+        
+        <button id="predictButton" class="btn btn-primary mt-3">Predict Disease</button>
+        <div id="result"></div>
+        <div id="description"></div>
+        <button id="newPatientButton" class="btn btn-info mt-3" style="display: none;">New Patient</button>
+    </div>
+    
+    
+    <script>
+        const symptoms = [
+            'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills', 
+            'joint_pain', 'stomach_pain', 'acidity', 'ulcers_on_tongue', 'muscle_wasting', 'vomiting', 
+            'burning_micturition', 'spotting_urination', 'fatigue', 'weight_gain', 'anxiety', 
+            'cold_hands_and_feets', 'mood_swings', 'weight_loss', 'restlessness', 'lethargy', 
+            'patches_in_throat', 'irregular_sugar_level', 'cough', 'high_fever', 'sunken_eyes', 
+            'breathlessness', 'sweating', 'dehydration', 'indigestion', 'headache', 'yellowish_skin', 
+            'dark_urine', 'nausea', 'loss_of_appetite', 'pain_behind_the_eyes', 'back_pain', 
+            'constipation', 'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellow_urine', 'yellowing_of_eyes', 
+            'acute_liver_failure', 'fluid_overload', 'swelling_of_stomach', 'swelled_lymph_nodes', 'malaise', 
+            'blurred_and_distorted_vision', 'phlegm', 'throat_irritation', 'redness_of_eyes', 'sinus_pressure', 
+            'runny_nose', 'congestion', 'chest_pain', 'weakness_in_limbs', 'fast_heart_rate', 
+            'pain_during_bowel_movements', 'pain_in_anal_region', 'bloody_stool', 'irritation_in_anus', 
+            'neck_pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs', 'swollen_blood_vessels', 
+            'puffy_face_and_eyes', 'enlarged_thyroid', 'brittle_nails', 'swollen_extremeties', 'excessive_hunger', 
+            'extra_marital_contacts', 'drying_and_tingling_lips', 'slurred_speech', 'knee_pain', 'hip_joint_pain', 
+            'muscle_weakness', 'stiff_neck', 'swelling_joints', 'movement_stiffness', 'spinning_movements', 
+            'loss_of_balance', 'unsteadiness', 'weakness_of_one_body_side', 'loss_of_smell', 'bladder_discomfort', 
+            'foul_smell_of_urine', 'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching', 
+            'toxic_look_(typhos)', 'depression', 'irritability', 'muscle_pain', 'altered_sensorium', 
+            'red_spots_over_body', 'belly_pain', 'abnormal_menstruation', 'dischromic_patches', 'watering_from_eyes', 
+            'increased_appetite', 'polyuria', 'family_history', 'mucoid_sputum', 'rusty_sputum', 'lack_of_concentration', 
+            'visual_disturbances', 'receiving_blood_transfusion', 'receiving_unsterile_injections', 'coma', 
+            'stomach_bleeding', 'distention_of_abdomen', 'history_of_alcohol_consumption', 'fluid_overload.1', 
+            'blood_in_sputum', 'prominent_veins_on_calf', 'palpitations', 'painful_walking', 'pus_filled_pimples', 
+            'blackheads', 'scurring', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 
+            'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
+        ];
+
+        const symptomList = document.getElementById('symptomList');
+        const selectedSymptoms = document.getElementById('selectedSymptoms');
+        const resultDiv = document.getElementById('result');
+        const descriptionDiv = document.getElementById('description');
+        const predictButton = document.getElementById('predictButton');
+        const clearButton = document.getElementById('clearButton');
+        const newPatientButton = document.getElementById('newPatientButton');
+        const userDetailsForm = document.getElementById('userDetailsForm');
+        const symptomsSection = document.getElementById('symptomsSection');
+
+        symptoms.forEach(symptom => {
+            const symptomItem = document.createElement('div');
+            symptomItem.className = 'symptom-item';
+            symptomItem.innerText = symptom;
+            symptomItem.onclick = () => addSymptom(symptom);
+            symptomList.appendChild(symptomItem);
+        });
+
+        function addSymptom(symptom) {
+            const existingSymptom = Array.from(selectedSymptoms.children).find(child => child.innerText === symptom);
+            if (!existingSymptom) {
+                const symptomItem = document.createElement('div');
+                symptomItem.className = 'symptom-item';
+                symptomItem.innerText = symptom;
+                symptomItem.onclick = () => removeSymptom(symptomItem);
+                selectedSymptoms.appendChild(symptomItem);
+                symptomsSection.style.display = 'block'; // Show symptoms section
+            }
+        }
+
+        function removeSymptom(symptomItem) {
+            selectedSymptoms.removeChild(symptomItem);
+            if (selectedSymptoms.children.length === 0) {
+                symptomsSection.style.display = 'none'; // Hide symptoms section
+                resultDiv.innerHTML = ''; // Clear result
+                descriptionDiv.innerHTML = ''; // Clear description
+            }
+        }
+
+       predictButton.onclick = async () => {
+    const selected = Array.from(selectedSymptoms.children).map(child => child.innerText);
+    console.log('Selected Symptoms:', selected); // Debugging statement
+    if (selected.length === 0) {
+        alert('Please select at least one symptom.');
+        console.log('No symptoms selected.'); // Debugging statement
+        return;
+    }
+    const response = await fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selected)
+    });
+    const result = await response.json();
+    resultDiv.innerHTML = `<strong>Predicted Disease:</strong> ${result.predicted_disease}`;
+    descriptionDiv.innerHTML = `<strong>Description:</strong> ${result.description}`;
+};
+
+
+clearButton.onclick = () => {
+            Array.from(selectedSymptoms.children)
+                .filter(child => child.tagName === 'DIV')
+                .forEach(child => selectedSymptoms.removeChild(child));
+            resultDiv.innerHTML = '';
+            descriptionDiv.innerHTML = '';
+        };
+
+        newPatientButton.onclick = () => {
+            symptomsSection.style.display = 'none'; // Hide symptoms section
+            userDetailsForm.reset(); // Reset form fields
+        };
+    </script>
+</body>
+</html>

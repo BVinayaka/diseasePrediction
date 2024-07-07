@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Hospitals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+            // Disable further attempts to get location
+            window.getLocation = function() {};
+        }
+
+        function showPosition(position) {
+            document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("longitude").value = position.coords.longitude;
+            document.getElementById("locationForm").submit();
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body onload="getLocation()">
+    <a href="/" class="back-link">Back to Home</a>
+    <h1>Find Nearby Hospitals</h1>
+    <form id="locationForm" method="POST" action="/hospital">
+        <input type="hidden" id="latitude" name="latitude" required>
+        <input type="hidden" id="longitude" name="longitude" required>
+        <button type="submit">Search</button>
+    </form>
+    <h2>Results:</h2>
+    <ul>
+        {% for hospital in hospitals %}
+            <li>{{ hospital.name }} ({{ hospital.lat }}, {{ hospital.lon }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
