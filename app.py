@@ -1,6 +1,7 @@
+from functools import wraps
 import string
 import bcrypt
-from flask import Flask, redirect, render_template, jsonify, request, session
+from flask import Flask, redirect, render_template, jsonify, request, session, url_for
 import joblib
 import pandas as pd
 import numpy as np
@@ -107,9 +108,9 @@ def get_major_hospitals():
                 'lon': element['lon'] if 'lon' in element else element['center']['lon']
             }
             hospitals.append(hospital)
-
+    number_of_hospital=20
     # Sort hospitals by distance from the center and limit to 20
-    hospitals = sorted(hospitals, key=lambda k: (float(k['lat']) - float(latitude))**2 + (float(k['lon']) - float(longitude))**2)[:20]
+    hospitals = sorted(hospitals, key=lambda k: (float(k['lat']) - float(latitude))**2 + (float(k['lon']) - float(longitude))**2)[:number_of_hospital]
 
     return jsonify({'hospitals': hospitals})
 
@@ -189,17 +190,16 @@ def login():
             return render_template('login.html', message='User not found')
 
     return render_template('login.html')
-@app.route('/hospital', methods=['GET', 'POST'])
-def hospital():
-    hospitals = []
-    if request.method == 'POST':
-        latitude = request.form.get('latitude')
-        longitude = request.form.get('longitude')
-        if latitude and longitude:
-            hospitals = get_nearby_hospitals(latitude, longitude)
-    return render_template('hospital.html', hospitals=hospitals)
 
+def login_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        return func(*args, **kwargs)
+    return decorated_function
 @app.route('/disease')
+@login_required
 def result_page():
     return render_template('disease.html')
 @app.route('/predict', methods=['POST'])
@@ -230,8 +230,12 @@ def predict():
         'description': description
     })
 
-
+@app.route('/hospital', methods=['GET', 'POST'])
+@login_required
+def hospital():
+    return render_template('hospital.html')
 @app.route('/dia')
+@login_required
 def dia():
     return render_template('diabetes.html')
 
