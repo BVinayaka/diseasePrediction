@@ -22,24 +22,19 @@ This Flask-based web application predicts diseases based on symptoms selected by
 ## Setup Instructions
 
 1. **Clone the Repository**
-   ```
-   git clone <repository-url>
-   cd <repository-directory>
-   ```
+
+   git clone https://github.com/BVinayaka/diseasePrediction.git
 
 2. **Install Dependencies**
-   ```
    pip install -r requirements.txt
-   ```
+
 
 3. **Configure MongoDB**
    - Install MongoDB locally or set up a remote MongoDB instance.
    - Update the MongoDB URI in `app.py` to point to your database.
 
 4. **Run the Application**
-   ```
    python app.py
-   ```
    The application will run locally at `http://localhost:5000`.
 
 5. **Access the Application**
