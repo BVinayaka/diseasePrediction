@@ -97,7 +97,7 @@
 <body>
     <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="card">
-            <div class="card-header text-light fw-bold fs-2">
+            <div class="card-header bg-info text-light fw-bold fs-2">
                 Signup
             </div>
             <div class="card-body">
@@ -127,8 +127,8 @@
                         <label for="password2" class="form-label text-light fw-semibold">Confirm Password</label>
                         <input type="password" class="form-control" id="password2" name="confirm_password" required>
                     </div>
-                    <button type="submit" class="btn btn-outline-light w-100">Signup</button>
-                    <button type="submit" class="btn btn-outline-light w-100" id="home">Home</button>
+                    <button type="submit" class="btn btn-outline-info w-100 mb-3">Signup</button>
+                    <button type="submit" class="btn btn-outline-info w-100" id="home">Back to Home</button>
                 </form>
                 <div class="already-account mt-3 text-center text-white">
                     Already have an account? <a href="/login" class="text-white">Login</a>
@@ -160,7 +160,13 @@
             }
         }
 
-        
+        //redirection
+        const back=document.getElementById('home');
+        back.onclick=()=>{
+            window.location.href='/';
+        }
+
+
     </script>
 </body>
 </html>
