@@ -3,34 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nearby Hospitals</title>
+    <title>Nearby Major Hospitals</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
+            const input = document.getElementById('locationInput');
+            const suggestionBox = document.getElementById('suggestions');
+            input.addEventListener('input', () => {
+                const query = input.value;
+                if (query.length > 2) {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            suggestionBox.innerHTML = '';
+                            data.forEach(location => {
+                                const option = document.createElement('div');
+                                option.classList.add('suggestion');
+                                option.textContent = `${location.display_name}`;
+                                option.addEventListener('click', () => {
+                                    input.value = location.display_name;
+                                    suggestionBox.innerHTML = '';
+                                    fetchMajorHospitals(location.lat, location.lon);
+                                });
+                                suggestionBox.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching location suggestions:', error));
+                } else {
+                    suggestionBox.innerHTML = '';
+                }
+            });
         });
 
-        function showPosition(position) {
-            const userLatitude = position.coords.latitude;
-            const userLongitude = position.coords.longitude;
+        function fetchMajorHospitals(latitude, longitude) {
+            console.log('Latitude:', latitude);
+            console.log('Longitude:', longitude);
 
-            console.log('User Latitude:', userLatitude);
-            console.log('User Longitude:', userLongitude);
+            alert(`Latitude: ${latitude}\nLongitude: ${longitude}`);
 
-            alert(`Latitude: ${userLatitude}\nLongitude: ${userLongitude}`);
-
-            fetch('/hospital', {
+            fetch('/major-hospitals', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    latitude: userLatitude,
-                    longitude: userLongitude
+                    latitude: latitude,
+                    longitude: longitude
                 })
             })
             .then(response => response.json())
@@ -38,31 +56,14 @@
                 console.log('Received hospital data:', data);
                 const hospitalList = document.getElementById('hospitalList');
                 hospitalList.innerHTML = '';
-                data.hospitals.forEach(hospital => {
+                data.hospitals.slice(0, 20).forEach(hospital => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `${hospital.name} (${hospital.lat}, ${hospital.lon}) 
-                        <a href="https://www.google.com/maps/dir/?api=1&origin=${userLatitude},${userLongitude}&destination=${hospital.lat},${hospital.lon}" target="_blank">Get Directions</a>`;
+                        <a href="https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${hospital.lat},${hospital.lon}" target="_blank">Get Directions</a>`;
                     hospitalList.appendChild(listItem);
                 });
             })
             .catch(error => console.error('Error fetching hospitals:', error));
-        }
-
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurred.");
-                    break;
-            }
         }
     </script>
     <style>
@@ -93,11 +94,44 @@
         li {
             margin: 10px 0;
         }
+
+        #searchContainer {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #locationInput {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 300px;
+        }
+
+        #suggestions {
+            width: 300px;
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .suggestion {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion:hover {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
     <a href="/" class="back-link">Back to Home</a>
-    <h1>Find Nearby Hospitals</h1>
+    <h1>Find Major Hospitals</h1>
+    <div id="searchContainer">
+        <input type="text" id="locationInput" placeholder="Enter your location">
+        <div id="suggestions"></div>
+    </div>
     <h2>Results:</h2>
     <ul id="hospitalList"></ul>
 </body>

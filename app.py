@@ -78,30 +78,39 @@ def get_disease_description(disease):
         return "Sorry, something went wrong."
 
 
-@app.route('/hospital', methods=['POST'])
-def get_nearby_hospitals():
+@app.route('/major-hospitals', methods=['POST'])
+def get_major_hospitals():
     data = request.get_json()
-    lat = data['latitude']
-    lon = data['longitude']
-    
-    # Log received coordinates for debugging
-    app.logger.info(f"Received Latitude: {lat}")
-    app.logger.info(f"Received Longitude: {lon}")
-    
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+
+    # Use Overpass API to fetch major hospitals in a larger radius
     overpass_url = "http://overpass-api.de/api/interpreter"
     overpass_query = f"""
     [out:json];
-    node["amenity"="hospital"](around:5000,{lat},{lon});
-    out body;
+    (
+      node["amenity"="hospital"](around:20000,{latitude},{longitude});
+      way["amenity"="hospital"](around:20000,{latitude},{longitude});
+      relation["amenity"="hospital"](around:20000,{latitude},{longitude});
+    );
+    out center;
     """
     response = requests.get(overpass_url, params={'data': overpass_query})
     data = response.json()
+
     hospitals = []
     for element in data['elements']:
-        name = element['tags'].get('name', 'No name available')
-        lat = element['lat']
-        lon = element['lon']
-        hospitals.append({'name': name, 'lat': lat, 'lon': lon})
+        if 'tags' in element and 'name' in element['tags']:
+            hospital = {
+                'name': element['tags']['name'],
+                'lat': element['lat'] if 'lat' in element else element['center']['lat'],
+                'lon': element['lon'] if 'lon' in element else element['center']['lon']
+            }
+            hospitals.append(hospital)
+
+    # Sort hospitals by distance from the center and limit to 20
+    hospitals = sorted(hospitals, key=lambda k: (float(k['lat']) - float(latitude))**2 + (float(k['lon']) - float(longitude))**2)[:20]
+
     return jsonify({'hospitals': hospitals})
 
 
