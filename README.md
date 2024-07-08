@@ -1,5 +1,3 @@
-Certainly! Here's a more concise `README.md` template that combines all sections into one cohesive document:
-
 ```markdown
 # Disease Prediction Web Application
 
