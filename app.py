@@ -153,7 +153,7 @@ def signup():
         }
         users_collection.insert_one(user_data)
 
-        return redirect('/')
+        return redirect('/login')
 
     return render_template('signup.html')
 
