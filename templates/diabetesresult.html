@@ -4,14 +4,15 @@
     <meta charset="utf-8">
     <title>Diabetes Predictor</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
-            background: #092756;
+            background: linear-gradient(135deg, #092756, #0d3a8c);
             color: #fff;
             font-size: 18px;
             text-align: center;
-            letter-spacing: 1.2px;
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -19,6 +20,27 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+        }
+
+        .navbar {
+            background-color: #333;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: #ffd700 !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffa500 !important;
         }
 
         .btn {
@@ -34,20 +56,22 @@
             border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         .btn:hover {
             background-color: #3762bc;
+            transform: translateY(-3px);
         }
 
         .results {
-            margin-top: 20px;
+            margin-top: 100px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             width: 80%;
             max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .results h1 {
@@ -68,40 +92,58 @@
             color: #2ecc71;
         }
 
-        .back-link {
-            margin-top: 20px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
         .bottom-links {
-            position: absolute;
-            bottom: 150px;
+            margin-top: 20px;
             width: 100%;
             display: flex;
             justify-content: center;
             gap: 20px;
         }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
-        <a href="/" class="btn">Back to Home</a>
-    <div class="results">
-        {% if prediction == 1 %}
-            <h1><span class="danger">Oops! You have DIABETES.</span></h1>
-            <p>Probability of having diabetes: {{ probability }}%</p>
-        {% elif prediction == 0 %}
-            <h1><span class="safe">Wow! You DON'T have diabetes.</span></h1>
-            <p>Probability of having diabetes: {{ probability }}%</p>
-        {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/">Diabetes Predictor</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/" onclick="confirmNavigation(event)">Home</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="results">
+            {% if prediction == 1 %}
+                <h1><span class="danger">Oops! You have DIABETES.</span></h1>
+                <p>Probability of having diabetes: {{ probability }}%</p>
+            {% elif prediction == 0 %}
+                <h1><span class="safe">Wow! You DON'T have diabetes.</span></h1>
+                <p>Probability of having diabetes: {{ probability }}%</p>
+            {% endif %}
+        </div>
+        <div class="bottom-links">
+            <a href="/hospital" class="btn">Nearby Hospitals</a>
+        </div>
     </div>
-    <div class="bottom-links">
-        <a href="/hospital" class="btn">Nearby Hospitals</a>
-    </div>
+    <script>
+        function confirmNavigation(event) {
+            if (!confirm("Do you really want to go to the home page?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

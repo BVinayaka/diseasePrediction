@@ -4,7 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nearby Major Hospitals</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .navbar {
+            background-color: #333;
+            width: 100%;
+        }
+
+        .navbar-brand {
+            color: #ffd700 !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffa500 !important;
+        }
+
+        .container {
+            margin-top: 00px;
+            text-align: center;
+        }
+
+        h1, h2 {
+            margin: 20px 0;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 15px;
+            color: #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #searchContainer {
+            margin: 20px 0;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            margin-left: 25%;
+        }
+
+        #locationInput {
+            padding: 10px;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+            flex-grow: 1;
+        }
+
+        #locationInput:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        #searchButton {
+            padding: 8px;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+
+        #suggestions {
+            width: 98%;
+            max-width: 600px;
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #333;
+            position: absolute;
+            z-index: 1000;
+            margin-left:18%;
+        }
+
+        .suggestion {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .suggestion:hover {
+            background-color: #f0f0f0;
+        }
+
+        .intro-text {
+            max-width: 600px;
+            margin: 20px auto;
+            font-size: 18px;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const input = document.getElementById('locationInput');
@@ -18,7 +139,7 @@
                             suggestionBox.innerHTML = '';
                             data.forEach(location => {
                                 const option = document.createElement('div');
-                                option.classList.add('suggestion');
+                                option.classList.add('suggestion', 'animate__animated', 'animate__fadeIn');
                                 option.textContent = `${location.display_name}`;
                                 option.addEventListener('click', () => {
                                     input.value = location.display_name;
@@ -57,82 +178,52 @@
                 const hospitalList = document.getElementById('hospitalList');
                 hospitalList.innerHTML = '';
                 data.hospitals.slice(0, 20).forEach(hospital => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `${hospital.name} (${hospital.lat}, ${hospital.lon}) 
-                        <a href="https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${hospital.lat},${hospital.lon}" target="_blank">Get Directions</a>`;
-                    hospitalList.appendChild(listItem);
+                    const card = document.createElement('div');
+                    card.classList.add('card', 'animate__animated', 'animate__fadeInUp');
+                    card.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${hospital.name}</h5>
+                            <p class="card-text">${hospital.lat}, ${hospital.lon}</p>
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${hospital.lat},${hospital.lon}" target="_blank" class="btn btn-primary">Get Directions</a>
+                        </div>`;
+                    hospitalList.appendChild(card);
                 });
             })
             .catch(error => console.error('Error fetching hospitals:', error));
         }
     </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .back-link {
-            margin-top: 20px;
-            text-decoration: none;
-            color: blue;
-        }
-
-        h1 {
-            margin: 20px 0;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 10px 0;
-        }
-
-        #searchContainer {
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #locationInput {
-            padding: 10px;
-            margin-bottom: 10px;
-            width: 300px;
-        }
-
-        #suggestions {
-            width: 300px;
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .suggestion {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .suggestion:hover {
-            background-color: #f0f0f0;
-        }
-    </style>
 </head>
 <body>
-    <a href="/" class="back-link">Back to Home</a>
-    <h1>Find Major Hospitals</h1>
-    <div id="searchContainer">
-        <input type="text" id="locationInput" placeholder="Enter your location">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/">Nearby Hospitals</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 class="animate__animated animate__fadeInDown">Find Nearby Major Hospitals</h1>
+        <p class="intro-text animate__animated animate__fadeInUp">Enter your location to search for major hospitals near you. Simply type in your address or city, and select from the suggestions that appear.</p>
+        <div id="searchContainer" class="input-group">
+            <input type="text" id="locationInput" class="form-control" placeholder="Enter your location">
+            <div class="input-group-append">
+                <button id="searchButton" class="btn" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
         <div id="suggestions"></div>
+        <div id="hospitalList" class="w-100"></div>
     </div>
-    <h2>Results:</h2>
-    <ul id="hospitalList"></ul>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

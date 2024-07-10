@@ -4,19 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prediction Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #ffffff;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
         }
-    
-        h1,
-        h3 {
-            text-align: center;
+
+        .navbar {
+            background-color: #333;
+            width: 100%;
         }
-    
+
+        .navbar-brand {
+            color: #ffd700 !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffa500 !important;
+        }
+
         #container {
             width: 90%;
             margin: 20px auto;
@@ -25,30 +42,31 @@
             align-items: center;
             padding: 20px;
             text-align: center;
-            text-indent: 30px;
             line-height: 1.6;
             font-size: large;
         }
-    
+
+        h1, h3 {
+            margin-top: 20px;
+        }
+
         #symptomsContainer {
             display: flex;
             justify-content: space-between;
             width: 100%;
         }
-    
-        #selectedSymptoms,
-        #symptomList {
+
+        #selectedSymptoms, #symptomList {
             width: calc(50% - 15px);
             padding: 10px;
-            border: 1px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            background-color: #c7c4c4;
-            max-height: 500px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            max-height: 300px;
             overflow-y: auto;
         }
-    
+
         .symptom-item {
             cursor: pointer;
             margin: 5px;
@@ -57,77 +75,57 @@
             border-radius: 5px;
             display: inline-block;
             transition: background-color 0.3s;
-            justify-content: center;
-            align-items: center;
         }
-    
+
         .symptom-item:hover {
             background-color: #a93333;
+            color: white;
         }
-    
+
         #selectedSymptoms .symptom-item {
             background-color: #b2ebf2;
             border-color: #9d2727;
         }
-    
-        #predictButton {
+
+        #predictButton, .btn {
             padding: 10px 20px;
             background-color: #00796b;
-            color: #fff;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
             margin-top: 20px;
         }
-    
-        #predictButton:hover {
+
+        #predictButton:hover, .btn:hover {
             background-color: #004d40;
         }
-    
-        #result {
+
+        #result, #description {
             margin-top: 20px;
             font-size: 1.2em;
-            color: #00796b;
+            color: #080808;
         }
-    
+
         .btn-danger {
             background-color: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
-    
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-    
+
         .btn-info {
             background-color: #17a2b8;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
-    
-        .btn-info:hover {
-            background-color: #011214;
-        }
-    
+
         .back-link {
             display: inline-block;
             padding: 10px 20px;
             margin-bottom: 20px;
             background-color: #00796b;
-            color: #fff;
+            color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s;
             font-size: 1em;
-            margin-left: 20px;
         }
 
         .back-link:hover {
@@ -135,7 +133,7 @@
         }
 
         #searchInput {
-            width: 40%;
+            width: 100%;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
@@ -145,13 +143,24 @@
     </style>
 </head>
 <body>
-    <a href="/" class="back-link">Back to Home</a>
-    <div id="container">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand">Disease Prediction</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="container" class="animate__animated animate__fadeIn">
         <div id="symptomsContainer">
             <div id="selectedSymptoms">
                 <button id="clearButton" class="btn btn-danger">Clear Selection</button>
                 <h3>Selected Symptoms</h3>
-                <!-- List of selected symptoms will be shown here -->
             </div>
             <div id="symptomList">
                 <h3>All Symptoms</h3>
@@ -159,10 +168,10 @@
                 <div id="symptomItems"></div>
             </div>
         </div>
-        <button id="predictButton" class="btn btn-primary mt-3">Predict Disease</button>
-        <div id="result"></div>
-        <div id="description"></div>
-        <button id="newPatientButton" class="btn btn-info mt-3" style="display: none;">New Patient</button>
+        <button id="predictButton" class="btn">Predict Disease</button>
+        <div id="result" class="animate__animated animate__fadeInUp"></div>
+        <div id="description" class="animate__animated animate__fadeInUp"></div>
+        <button id="newPatientButton" class="btn btn-info" style="display: none;">New Patient</button>
     </div>
 
     <script>
@@ -189,89 +198,98 @@
             'red_spots_over_body', 'belly_pain', 'abnormal_menstruation', 'dischromic_patches', 'watering_from_eyes', 
             'increased_appetite', 'polyuria', 'family_history', 'mucoid_sputum', 'rusty_sputum', 'lack_of_concentration', 
             'visual_disturbances', 'receiving_blood_transfusion', 'receiving_unsterile_injections', 'coma', 
-            'stomach_bleeding', 'distention_of_abdomen', 'history_of_alcohol_consumption', 'fluid_overload.1', 
-            'blood_in_sputum', 'prominent_veins_on_calf', 'palpitations', 'painful_walking', 'pus_filled_pimples', 
-            'blackheads', 'scurring', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 
-            'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
-        ];
+                'stomach_bleeding', 'distention_of_abdomen', 'history_of_alcohol_consumption', 'fluid_overload.1', 
+        'blood_in_sputum', 'prominent_veins_on_calf', 'palpitations', 'painful_walking', 'pus_filled_pimples', 
+        'blackheads', 'scurring', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 
+        'blister', 'red_sore_around_nose', 'yellow_crust_ooze'
+    ];
 
-        const symptomList = document.getElementById('symptomItems');
-        const selectedSymptoms = document.getElementById('selectedSymptoms');
-        const resultDiv = document.getElementById('result');
-        const descriptionDiv = document.getElementById('description');
-        const predictButton = document.getElementById('predictButton');
-        const clearButton = document.getElementById('clearButton');
-        const newPatientButton = document.getElementById('newPatientButton');
-        const searchInput = document.getElementById('searchInput');
+    const symptomList = document.getElementById('symptomItems');
+    const selectedSymptoms = document.getElementById('selectedSymptoms');
+    const resultDiv = document.getElementById('result');
+    const descriptionDiv = document.getElementById('description');
+    const predictButton = document.getElementById('predictButton');
+    const clearButton = document.getElementById('clearButton');
+    const newPatientButton = document.getElementById('newPatientButton');
+    const searchInput = document.getElementById('searchInput');
 
-        function createSymptomItem(symptom) {
-            const symptomItem = document.createElement('div');
-            symptomItem.className = 'symptom-item';
-            symptomItem.innerText = symptom;
-            symptomItem.onclick = () => addSymptom(symptom);
-            return symptomItem;
+    function createSymptomItem(symptom) {
+        const symptomItem = document.createElement('div');
+        symptomItem.className = 'symptom-item animate__animated animate__fadeIn';
+        symptomItem.innerText = symptom;
+        symptomItem.onclick = () => addSymptom(symptom);
+        return symptomItem;
+    }
+
+    function updateSymptomList(filteredSymptoms) {
+        symptomList.innerHTML = '';
+        filteredSymptoms.forEach(symptom => {
+            symptomList.appendChild(createSymptomItem(symptom));
+        });
+    }
+
+    function addSymptom(symptom) {
+        const existingSymptom = Array.from(selectedSymptoms.children).find(child => child.innerText === symptom);
+        if (!existingSymptom) {
+            const symptomItem = createSymptomItem(symptom);
+            symptomItem.onclick = () => removeSymptom(symptomItem);
+            selectedSymptoms.appendChild(symptomItem);
         }
+    }
 
-        function updateSymptomList(filteredSymptoms) {
-            symptomList.innerHTML = '';
-            filteredSymptoms.forEach(symptom => {
-                symptomList.appendChild(createSymptomItem(symptom));
-            });
+    function removeSymptom(symptomItem) {
+        selectedSymptoms.removeChild(symptomItem);
+    }
+
+    searchInput.oninput = () => {
+        const query = searchInput.value.toLowerCase();
+        const filteredSymptoms = symptoms.filter(symptom => symptom.toLowerCase().includes(query));
+        updateSymptomList(filteredSymptoms);
+    };
+
+    predictButton.onclick = async () => {
+        const selected = Array.from(selectedSymptoms.children).map(child => child.innerText);
+        if (selected.length === 0) {
+            alert('Please select at least one symptom.');
+            return;
         }
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(selected)
+        });
+        const result = await response.json();
+        resultDiv.innerHTML = `<strong>Predicted Disease:</strong> ${result.predicted_disease}`;
+        descriptionDiv.innerHTML = `<strong>Description:</strong> ${result.description}`;
+        newPatientButton.style.display = 'block';
+    };
 
-        function addSymptom(symptom) {
-            const existingSymptom = Array.from(selectedSymptoms.children).find(child => child.innerText === symptom);
-            if (!existingSymptom) {
-                const symptomItem = createSymptomItem(symptom);
-                symptomItem.onclick = () => removeSymptom(symptomItem);
-                selectedSymptoms.appendChild(symptomItem);
-            }
-        }
+    clearButton.onclick = () => {
+        Array.from(selectedSymptoms.children)
+            .filter(child => child.tagName === 'DIV')
+            .forEach(child => selectedSymptoms.removeChild(child));
+        resultDiv.innerHTML = '';
+        descriptionDiv.innerHTML = '';
+        newPatientButton.style.display = 'none';
+    };
 
-        function removeSymptom(symptomItem) {
-            selectedSymptoms.removeChild(symptomItem);
-        }
+    newPatientButton.onclick = () => {
+        Array.from(selectedSymptoms.children)
+            .filter(child => child.tagName === 'DIV')
+            .forEach(child => selectedSymptoms.removeChild(child));
+        resultDiv.innerHTML = '';
+        descriptionDiv.innerHTML = '';
+        newPatientButton.style.display = 'none';
+    };
 
-        searchInput.oninput = () => {
-            const query = searchInput.value.toLowerCase();
-            const filteredSymptoms = symptoms.filter(symptom => symptom.toLowerCase().includes(query));
-            updateSymptomList(filteredSymptoms);
-        };
-
-        predictButton.onclick = async () => {
-            const selected = Array.from(selectedSymptoms.children).map(child => child.innerText);
-            if (selected.length === 0) {
-                alert('Please select at least one symptom.');
-                return;
-            }
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(selected)
-            });
-            const result = await response.json();
-            resultDiv.innerHTML = `<strong>Predicted Disease:</strong> ${result.predicted_disease}`;
-            descriptionDiv.innerHTML = `<strong>Description:</strong> ${result.description}`;
-        };
-
-        clearButton.onclick = () => {
-            Array.from(selectedSymptoms.children)
-                .filter(child => child.tagName === 'DIV')
-                .forEach(child => selectedSymptoms.removeChild(child));
-            resultDiv.innerHTML = '';
-            descriptionDiv.innerHTML = '';
-        };
-
-        newPatientButton.onclick = () => {
-            selectedSymptoms.innerHTML = '';
-            resultDiv.innerHTML = '';
-            descriptionDiv.innerHTML = '';
-        };
-
-        // Initial rendering of symptom list
-        updateSymptomList(symptoms);
+    // Initial rendering of symptom list
+    updateSymptomList(symptoms);
     </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
