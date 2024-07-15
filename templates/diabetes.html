@@ -89,6 +89,15 @@
         .btn-block {
             width: 100%;
         }
+
+        .clear-button {
+            background-color: rgba(255, 99, 71, 0.7); /* Tomato color */
+            border: 1px solid rgba(255, 69, 0, 0.7); /* Darker tomato color */
+        }
+
+        .clear-button:hover {
+            background-color: rgba(255, 69, 0, 0.7); /* Darker tomato color */
+        }
     </style>
 </head>
 <body>
@@ -104,6 +113,7 @@
             <input class="form-input" type="text" id="dpf" name="dpf" placeholder="Diabetes Pedigree Function eg. 0.52"><br>
             <input class="form-input" type="text" id="age" name="age" placeholder="Age (years) eg. 34"><br>
             <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+            <button type="button" class="btn btn-block clear-button" onclick="clearForm()">Clear All</button>
         </form>
         <br><br>
         {{ prediction_text }}
@@ -120,6 +130,10 @@
                 }
             }
             return true;
+        }
+
+        function clearForm() {
+            document.getElementById('predictionForm').reset();
         }
     </script>
 </body>

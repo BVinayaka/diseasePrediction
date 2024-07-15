@@ -109,9 +109,7 @@ def get_major_hospitals():
             }
             hospitals.append(hospital)
     number_of_hospital=20
-    # Sort hospitals by distance from the center and limit to 20
     hospitals = sorted(hospitals, key=lambda k: (float(k['lat']) - float(latitude))**2 + (float(k['lon']) - float(longitude))**2)[:number_of_hospital]
-
     return jsonify({'hospitals': hospitals})
 
 
